@@ -1,0 +1,32 @@
+# Logs & Environment
+node_modules
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python Virtual Environment & Cache
+backend/venv/
+backend/env/
+backend/uploads/
+backend/__pycache__/
+backend/*/__pycache__/
+backend/*/*/__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build & Output
+dist
+dist-ssr
+*.local
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

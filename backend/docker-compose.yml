@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agrisense_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: agri_user
+      POSTGRES_PASSWORD: agri_password
+      POSTGRES_DB: agrisense_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agri_user -d agrisense_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agrisense_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=AgriSense AI Backend
+      - API_V1_STR=/api/v1
+      - SECRET_KEY=AGRISENSE_SECRET_KEY_SUPER_SECURE_JWT_TOKEN_KEY_CHANGE_IN_PRODUCTION
+      - DATABASE_URL=postgresql+asyncpg://agri_user:agri_password@postgres:5432/agrisense_db
+      - STORAGE_TYPE=local
+      - UPLOAD_DIR=uploads
+      - AI_PROVIDER=mock
+      - BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:3000"]
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  uploads_data:

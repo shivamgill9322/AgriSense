@@ -1,0 +1,87 @@
+import React, { useState } from 'react';
+import { Cpu, Filter, Sparkles, Sprout, ArrowRight } from 'lucide-react';
+import RecommendationCard from '../components/RecommendationCard';
+import { CROPS_DATA } from '../data/cropsData';
+import { analyzeSoilData } from '../utils/soilEngine';
+
+export default function Recommendations({ soilAnalysis, onSelectCrop }) {
+  const [seasonFilter, setSeasonFilter] = useState('All');
+  
+  // Use session soil analysis or generate default analysis
+  const activeAnalysis = soilAnalysis || analyzeSoilData({
+    soilType: 'Loamy',
+    ph: 6.5,
+    nitrogen: 45,
+    phosphorus: 30,
+    potassium: 40,
+    moisture: 55
+  });
+
+  const recommendations = activeAnalysis.recommendations.filter((r) => {
+    if (seasonFilter === 'All') return true;
+    return r.crop.season.toLowerCase().includes(seasonFilter.toLowerCase());
+  });
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-agri-800/60 pb-6">
+        <div className="space-y-1">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-agri-950 border border-agri-500/40 text-neon-green text-xs font-bold uppercase tracking-wider">
+            <Cpu className="w-3.5 h-3.5" />
+            <span>AI Agricultural Recommendation Engine</span>
+          </div>
+          <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-white">
+            What should you grow?
+          </h1>
+          <p className="text-sm text-gray-300">
+            Explore crops prioritized for your field based on provided soil chemistry and regional parameters.
+          </p>
+        </div>
+
+        {/* Season Filter Dropdown */}
+        <div className="flex items-center space-x-2 glass-panel px-4 py-2 rounded-2xl border border-agri-700/50">
+          <Filter className="w-4 h-4 text-neon-green" />
+          <span className="text-xs font-semibold text-gray-400">Season:</span>
+          <select
+            value={seasonFilter}
+            onChange={(e) => setSeasonFilter(e.target.value)}
+            className="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer"
+          >
+            <option value="All" className="bg-dark-card text-white">All Seasons</option>
+            <option value="Rabi" className="bg-dark-card text-white">Rabi (Winter)</option>
+            <option value="Kharif" className="bg-dark-card text-white">Kharif (Monsoon)</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Active Soil Parameters Banner */}
+      <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-agri-700/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center space-x-2">
+          <Sprout className="w-4 h-4 text-neon-green" />
+          <span className="text-gray-300 font-semibold">Current Soil Profile:</span>
+          <span className="bg-agri-950 px-2.5 py-1 rounded-full text-neon-green font-bold border border-agri-800">
+            {activeAnalysis.soilType} • pH {activeAnalysis.metrics.ph.value} • N:{activeAnalysis.metrics.nitrogen.value} P:{activeAnalysis.metrics.phosphorus.value} K:{activeAnalysis.metrics.potassium.value}
+          </span>
+        </div>
+
+        <span className="text-gray-400">
+          Showing <strong className="text-white">{recommendations.length}</strong> evaluated crops
+        </span>
+      </div>
+
+      {/* Recommendation Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recommendations.map((rec) => (
+          <RecommendationCard
+            key={rec.crop.id}
+            recommendation={rec}
+            onSelectCrop={onSelectCrop}
+          />
+        ))}
+      </div>
+
+    </div>
+  );
+}
