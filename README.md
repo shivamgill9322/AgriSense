@@ -104,7 +104,7 @@ npm run build
 
 ## 📑 Submission Documentation
 
-- [`PITCH_5_QUESTIONS.md`](PITCH_5_QUESTIONS.md) — Mandatory 5 pitch questions for hackathon judges.
+
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — System architecture diagram and data pipelines.
 - [`FAILURE_LOG.md`](FAILURE_LOG.md) — Engineering failure log, edge cases, and future roadmap.
 
